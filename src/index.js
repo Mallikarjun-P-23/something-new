@@ -1,24 +1,8 @@
 import dotenv from 'dotenv';
-import mongoose from "mongoose";
-import { DB_NAME } from "./constants.js";
-import express from "express";
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 dotenv.config({ path: './.env' });
-
-const app = express();
-
-// Basic route
-app.get('/', (req, res) => {
-    res.json({ 
-        message: 'Server is running!',
-        timestamp: new Date().toISOString() 
-    });
-});
-
-app.get('/health', (req, res) => {
-    res.json({ status: 'OK', database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected' });
-});
 
 // Connect to database and start server
 connectDB()
