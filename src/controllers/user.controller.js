@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose"; 
 
 const generateAccessAndRefreshTokens = async(userId)=>{
     try{
@@ -149,8 +150,8 @@ const logoutUser = asyncHandler(async (req,res)=>{
    await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             }
         },
         {
@@ -170,8 +171,7 @@ const logoutUser = asyncHandler(async (req,res)=>{
 })
 
 const refreshAccessToken = asyncHandler(async (req,res) =>{
-    const incomingRefreshToken = req.cookies.
-     refreshToken || req.body.refreshToken;
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
      if(!incomingRefreshToken){
         throw new ApiError(401,"Unauthorized request")
@@ -392,7 +392,7 @@ const getUserChannelProfile = asyncHandler(async (req,res) =>{
             fullname:1,
             username:1,
             subscribersCount:1,
-            channelsSubscribedToCount:1,
+            subscribedToCount:1,
             isSubscribed:1,
             avatar :1,
             coverImage:1,
@@ -433,7 +433,7 @@ const getWatchHistory = asyncHandler(async (req,res)=>{
                     {
                         $lookup:{
                             from:"users",
-                            localField:"_id",
+                            localField:"owner",
                             foreignField:"_id",
                             as:"owner",
                             pipeline:[
@@ -460,7 +460,7 @@ const getWatchHistory = asyncHandler(async (req,res)=>{
     ])
 
     return res
-              .ststus(200)
+              .status(200)
               .json(
                 new ApiResponse(
                     200,
